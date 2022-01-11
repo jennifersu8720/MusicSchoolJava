@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-//TODO add id to instrument_lease
-//TODO do not show instrument in list if <=0
 
 public class App {
     Scanner scan = new Scanner(System.in);
@@ -202,7 +200,6 @@ public class App {
         connection.commit();
     }
 
-    //fixa om <= 0, visa inte instrument
     void listAllInstruments () throws SQLException {
         PreparedStatement findAllInstrumentsStmt = this.connection.prepareStatement("SELECT * FROM instrument");
         try (ResultSet instruments = findAllInstrumentsStmt.executeQuery()) {
