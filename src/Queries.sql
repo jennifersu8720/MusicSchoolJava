@@ -17,7 +17,7 @@ SELECT DATE_TRUNC('year',start_time) AS  year,
 FROM class_type
 GROUP BY DATE_TRUNC('year',start_time);
 
---List all instructors who has given more than a specific number of lessons during the current month. 
+--List all instructors who have given more than a specific number of lessons during the current month. 
 --Sum all lessons, independent of type, and sort the result by the number of given lessons.
 SELECT class_type.instructor_id AS instructor,
 	COUNT(id) AS nbrOfLessons
@@ -29,6 +29,7 @@ ORDER BY nbrOfLessons desc
 
 --List all ensembles held during the next week, sorted by music genre and weekday. 
 --For each ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.
+CREATE VIEW SpotsLeftEnsemble AS
 SELECT start_time, end_time, type_of_instrument_or_genre,ensemble.minimum_nbr, 
 ensemble.maximum_nbr, ensemble.id,
 (CASE 

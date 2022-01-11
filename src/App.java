@@ -30,9 +30,10 @@ public class App {
             runMenu();
         } catch (SQLException | ClassNotFoundException exc) {
             exc.printStackTrace();
+            handleException();
         }
     }
-    //commit och rollback?
+    
     //print menu
     void runMenu () throws SQLException {
         while(true) {
@@ -104,7 +105,6 @@ public class App {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             return false;
-            //rollback
         }
     }
 
@@ -125,17 +125,16 @@ public class App {
                 PreparedStatement updateStockStmt = this.connection.prepareStatement("UPDATE instrument SET rented=rented+1 WHERE id = ?;");
                 updateStockStmt.setInt(1, instrument_id);
                 updateStockStmt.executeUpdate();
-                //commit
+                connection.commit();
             } else{
                 System.out.println("The rental cannot be carried out!");
-                //hoppas till catch, rollback
             }      
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-            //rollback
+            handleException();
         }
     }
-    //rollback och commit på denna också?
+    
     String activeRental (int instrument_id, int student_id)throws SQLException{
         PreparedStatement findActiveLease = this.connection.prepareStatement("SELECT active_rental FROM instrument_lease WHERE student_id = ? AND instrument_id = ?;");
         findActiveLease.setInt(1, student_id);
@@ -148,6 +147,7 @@ public class App {
             } }
            catch (SQLException sqle) {
             sqle.printStackTrace();
+            handleException();
         }
         
         ResultSet Lease = findActiveLease.executeQuery();
@@ -169,11 +169,10 @@ public class App {
             updateStock.executeUpdate();
 
             System.out.println("\n Lease terminated \n");
-            //commit
+            connection.commit();
         } 
         else {
             System.out.println("\n Lease already terminated");
-            //rollback
         }
     } 
 
@@ -183,11 +182,9 @@ public class App {
             while (instruments.next()) {
                 System.out.println(
                 "id: " + instruments.getInt(1) + ", student: " + instruments.getString(2) + ", type of instrument: " + instruments.getString(3) + ", active rental: " + instruments.getString(5));
-                //commit
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-            //rollback
         }
     }
     
@@ -202,7 +199,7 @@ public class App {
         insertStmt.executeUpdate();
 
         System.out.println("Added!");
-        //commit
+        connection.commit();
     }
 
     //fixa om <= 0, visa inte instrument
@@ -213,11 +210,9 @@ public class App {
               System.out.println(
                   "id: " + instruments.getInt(1) + ", type of instrument: " + instruments.getString(2) + ", available to rent: " + (instruments.getInt(3) - instruments.getInt(4))
                   + ", brand: " + instruments.getString(5)+ ", price: " + instruments.getInt(6));
-                  //commit
             }
           } catch (SQLException sqle) {
             sqle.printStackTrace();
-            //rollback
           }
     }
 
@@ -225,5 +220,12 @@ public class App {
         Class.forName("org.postgresql.Driver");
         return DriverManager.getConnection("jdbc:postgresql://localhost:5432/task3_logphysmodel",
           "postgres", "Kthpostgres");
+    }
+
+    private void handleException() {
+        try {
+            connection.rollback();
+        } catch (SQLException rollbackExc) {
+        }
     }
 }
