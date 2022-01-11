@@ -24,7 +24,7 @@ public class App {
         System.out.println("Connecting to database!");
         try (Connection conn = createConnection()) {
             this.connection = conn;
-
+            connection.setAutoCommit(false);
             System.out.println("Connected successfully!");
 
             runMenu();
@@ -50,14 +50,14 @@ public class App {
                 System.out.println("Type: ");
                 String type = scan.next();
                 System.out.println("Number in stock: ");
-                int total_nbr = scan.nextInt();
+                int nbr_in_stock = scan.nextInt();
                 System.out.println("Rented: ");
                 int rented = scan.nextInt();
                 System.out.println("Brand: ");
                 String brand = scan.next();
                 System.out.println("Price: ");
                 int price = scan.nextInt();
-                addInstrument(id, type, total_nbr, rented, brand, price);
+                addInstrument(id, type, nbr_in_stock, rented, brand, price);
 
             } else if (menuChoice == 3) {
                 System.out.println("\nType student ID: ");
@@ -109,7 +109,7 @@ public class App {
     }
 
     void rentInstrument(int student_id, int instrument_id, String start_month, String end_month) throws SQLException{
-        PreparedStatement instrumentStmt = this.connection.prepareStatement("SELECT total_nbr, rented FROM instrument WHERE id = ?");
+        PreparedStatement instrumentStmt = this.connection.prepareStatement("SELECT nbr_in_stock, rented FROM instrument WHERE id = ?");
         instrumentStmt.setInt(1, instrument_id);
         try (ResultSet instrument = instrumentStmt.executeQuery()) {
             instrument.next();
@@ -188,11 +188,11 @@ public class App {
         }
     }
     
-    void addInstrument (int id, String type, int total_nbr, int rented, String brand, int price) throws SQLException {
-        PreparedStatement insertStmt = this.connection.prepareStatement("INSERT INTO instrument (id, type, total_nbr, rented, brand, price) VALUES (?, ?, ?, ?, ?, ?)");
+    void addInstrument (int id, String type, int nbr_in_stock, int rented, String brand, int price) throws SQLException {
+        PreparedStatement insertStmt = this.connection.prepareStatement("INSERT INTO instrument (id, type, nbr_in_stock, rented, brand, price) VALUES (?, ?, ?, ?, ?, ?)");
         insertStmt.setInt(1, id);
         insertStmt.setString(2, type);
-        insertStmt.setInt(3, total_nbr);
+        insertStmt.setInt(3, nbr_in_stock);
         insertStmt.setInt(4, rented);
         insertStmt.setString(5, brand);
         insertStmt.setInt(6, price);
@@ -218,7 +218,7 @@ public class App {
 
     private Connection createConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
-        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/task3_logphysmodel",
+        return DriverManager.getConnection("jdbc:postgresql://localhost:5432/logphysmodel_updated",
           "postgres", "Kthpostgres");
     }
 
